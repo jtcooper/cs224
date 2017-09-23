@@ -2,22 +2,16 @@
 
 typedef unsigned char *byte_pointer;
 
-void show_bytes(byte_pointer start, size_t len) {
-	printf("%x", start[0]);
-	printf("\n");
-	if (start[0] && 1) {
-		printf("little endian");
-	}
-	else {
-		printf("big endian");
-	}
-	printf("\n");
+int get_endian(byte_pointer x) {
+	return (x[0] && 1);
 }
 
-int show_short(short x) {
-	return show_bytes((byte_pointer) &x, sizeof(short));
+int is_little_endian(void) {
+	int x = 1;
+	return get_endian((byte_pointer) &x);
 }
 
 int main (void) {
-	return show_short(1);
+	printf("%d\n", is_little_endian());
+	return 0;
 }
