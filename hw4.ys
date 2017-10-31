@@ -1,0 +1,93 @@
+init:
+	.pos 0
+	irmovq	stack, %rsp
+	call	main
+	halt
+
+	.align 8
+array:
+	.quad 0x0000000000000004
+	.quad 0x0000000000000003
+	.quad 0x0000000000000005
+	.quad 0x0000000000000001
+	.quad 0x0000000000000002
+	.quad 0
+
+bubble_p:
+	pushq	%rbp
+	rrmovq	%rsp, %rbp
+	irmovq	$1, %r8
+	irmovq	$8, %r9
+	irmovq	$0, %r10
+	rmmovq	%rdi, -56(%rbp)
+	rmmovq	%rsi, -64(%rbp)
+	mrmovq	-64(%rbp), %rax
+	subq	%r8, %rax		#r8 = 1
+	rmmovq	%rax, -32(%rbp)
+	jmp	L12
+L16:
+	mrmovq	-56(%rbp), %rax
+	rmmovq	%rax, -24(%rbp)
+	rmmovq	%r10, -40(%rbp)
+	jmp	L13
+L15:
+	mrmovq	-24(%rbp), %rax
+	addq	%r9, %rax		#r9 = 8
+	rmmovq	%rax, -16(%rbp)
+	mrmovq	-16(%rbp), %rax
+	mrmovq	(%rax), %rdx
+	mrmovq	-24(%rbp), %rax
+	mrmovq	(%rax), %rax
+	rrmovq	%rdx, %rcx
+	subq	%rax, %rcx
+	jge	L14
+	mrmovq	-16(%rbp), %rax
+	mrmovq	(%rax), %rax
+	rmmovq	%rax, -8(%rbp)
+	mrmovq	-24(%rbp), %rax
+	mrmovq	(%rax), %rdx
+	mrmovq	-16(%rbp), %rax
+	rmmovq	%rdx, (%rax)
+	mrmovq	-24(%rbp), %rax
+	mrmovq	-8(%rbp), %rdx
+	rmmovq	%rdx, (%rax)
+L14:
+	mrmovq	-24(%rbp), %rcx
+	addq	%r9, %rcx		#r9 = 8
+	rmmovq	%rcx, -24(%rbp)
+	mrmovq	-40(%rbp), %rcx
+	addq	%r8, %rcx		#r8 = 1
+	rmmovq	%rcx, -40(%rbp)
+L13:
+	mrmovq	-40(%rbp), %rax
+	mrmovq	-32(%rbp), %rcx
+	subq	%rax, %rcx
+	jg	L15
+	mrmovq	-32(%rbp), %rcx
+	subq	%r8, %rcx
+	rmmovq	%rcx, -32(%rbp)
+L12:
+	mrmovq	-32(%rbp), %rcx
+	subq	%r10, %rcx		#r10 = 0
+	jg	L16
+	nop
+	popq	%rbp
+	ret
+
+main:
+
+	irmovq	array, %rdi
+	irmovq	$5, %rsi
+	
+	call	bubble_p
+	# put the sorted array values in the registers
+	mrmovq	(%rdi), %r8
+	mrmovq	$8(%rdi), %r9
+	mrmovq	$16(%rdi), %r10
+	mrmovq	$24(%rdi), %r11
+	mrmovq	$32(%rdi), %r12
+
+	ret
+
+	.pos 0xa00
+stack:
