@@ -1,0 +1,61 @@
+init:
+	.pos 0
+	irmovq	stack, %rsp
+	irmovq	e1e1, %rdi
+	irmovq	$256, %r8	#test to see if these values stay the same
+	irmovq	$512, %r9
+	irmovq	$1024, %r10
+	call	sum_list
+	rrmovq	%rax, %rdx
+	irmovq	$0, %rax
+	halt
+
+	.align 8
+ele1:
+	.quad 0x00a
+	.quad ele2
+ele2:
+	.quad 0x0b0
+	.quad ele3
+ele3:
+	.quad 0xc00
+	.quad 0
+
+sum_list:
+	pushq	%rbp
+	pushq	%r8
+	pushq	%r9
+	pushq	%rdx
+	rrmovq	%rsp, %rbp
+	irmovq	$16, %r8
+	irmovq	$0, %r9
+
+	subq	%r8, %rsp
+	rmmovq	%rcx, 16(%rbp)
+	rmmovq	%r9, -8(%rbp)
+	jmp	L2
+L3:
+	#mrmovq	16(%rbp), %rax
+	mrmovq	%rdi, %rax
+	mrmovq	(%rax), %rax
+	mrmovq	-8(%rbp), %rdx
+	addq	%rax, %rdx
+	rmmovq	%rdx, -8(%rbp)
+	mrmovq	16(%rbp), %rax
+	mrmovq	8(%rax), %rax
+	rmmovq	%rax, 16(%rbp)
+L2:
+	mrmovq	16(%rbp), %rdx
+	andq	%rdx, %rdx
+	jne	L3
+	mrmovq	-8(%rbp), %rax
+	addq	$16, %rsp
+
+	popq	%rdx
+	popq	%r9
+	popq	%r8
+	popq	%rbp
+	ret
+
+	.pos 0xa00
+stack:
